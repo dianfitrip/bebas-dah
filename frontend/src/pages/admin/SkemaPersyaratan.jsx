@@ -1,27 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import api from "../../services/api";
 import { 
-  Search, Plus, Edit2, Trash2, X, Save, Loader2, FileCheck 
+  Search, Plus, Trash2, X, Save, ArrowLeft, FileCheck 
 } from 'lucide-react';
 import './adminstyles/Persyaratan.css';
 
-const Persyaratan = () => {
-  // --- STATE ---
-  const [data, setData] = useState([]);
+const SkemaPersyaratan = () => {
+  const { id } = useParams(); // id_skema dari URL
+  const navigate = useNavigate();
+
+  const [skemaDetail, setSkemaDetail] = useState(null);
+  const [data, setData] = useState([]); // Data persyaratan yang sudah di-attach
+  const [allPersyaratan, setAllPersyaratan] = useState([]); // Master data persyaratan (opsional jika pilih dari yang ada)
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
   // Modal State
   const [showModal, setShowModal] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [currentId, setCurrentId] = useState(null);
+  const [formMode, setFormMode] = useState('pilih'); // 'pilih' (attach existing) atau 'baru' (create new)
 
-  // Form State
   const initialForm = {
+    id_persyaratan: '', // untuk attach
     nama_persyaratan: '',
-    jenis_persyaratan: 'dasar', // Default ENUM
-    keterangan: ''
+    jenis_persyaratan: 'dasar',
+    keterangan: '',
+    wajib: true
   };
   const [formData, setFormData] = useState(initialForm);
 
@@ -29,11 +34,20 @@ const Persyaratan = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/admin/persyaratan');
-      setData(response.data.data || []);
+      // Ambil detail skema beserta persyaratannya
+      // Asumsi backend memiliki relasi Skema -> Persyaratan
+      const resSkema = await api.get(`/admin/skema/${id}`);
+      setSkemaDetail(resSkema.data.data);
+      
+      // Jika API skema mengembalikan relasi persyaratannya di dalam property persyaratans
+      setData(resSkema.data.data.persyaratans || []); 
+
+      // Ambil semua master persyaratan untuk opsi dropdown "Pilih yang sudah ada"
+      const resAll = await api.get('/admin/persyaratan');
+      setAllPersyaratan(resAll.data.data || []);
     } catch (error) {
       console.error(error);
-      Swal.fire('Error', 'Gagal memuat data persyaratan', 'error');
+      Swal.fire('Error', 'Gagal memuat data persyaratan skema', 'error');
     } finally {
       setLoading(false);
     }
@@ -41,205 +55,252 @@ const Persyaratan = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [id]);
 
   // --- HANDLERS ---
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleCreateOrAttach = async (e) => {
     e.preventDefault();
     try {
-      if (isEditMode) {
-        // Pastikan route PUT ada di backend
-        await api.put(`/admin/persyaratan/${currentId}`, formData);
-        Swal.fire('Sukses', 'Persyaratan berhasil diperbarui', 'success');
+      if (formMode === 'pilih') {
+        if (!formData.id_persyaratan) return Swal.fire('Peringatan', 'Pilih persyaratan terlebih dahulu', 'warning');
+        
+        // Endpoint untuk mengaitkan (Attach) Persyaratan ke Skema
+        await api.post('/admin/persyaratan/attach', {
+          id_skema: id,
+          id_persyaratan: formData.id_persyaratan,
+          wajib: formData.wajib
+        });
+        Swal.fire('Sukses!', 'Persyaratan berhasil ditambahkan ke skema', 'success');
       } else {
-        await api.post('/admin/persyaratan', formData);
-        Swal.fire('Sukses', 'Persyaratan berhasil ditambahkan', 'success');
+        // Buat Persyaratan Baru lalu (opsional) attach ke skema dari backend
+        // Kamu bisa mengirim id_skema di payload jika backend menanganinya langsung
+        await api.post('/admin/persyaratan', {
+          nama_persyaratan: formData.nama_persyaratan,
+          jenis_persyaratan: formData.jenis_persyaratan,
+          keterangan: formData.keterangan,
+          id_skema: id, // Kirim id_skema agar backend tahu untuk meng-attach-nya juga
+          wajib: formData.wajib
+        });
+        Swal.fire('Sukses!', 'Persyaratan baru berhasil dibuat dan ditambahkan ke skema', 'success');
       }
+      
       setShowModal(false);
+      setFormData(initialForm);
       fetchData();
     } catch (error) {
-      Swal.fire('Gagal', error.response?.data?.message || 'Terjadi kesalahan', 'error');
+      Swal.fire('Error', error.response?.data?.message || 'Gagal menyimpan data', 'error');
     }
   };
 
-  const handleEdit = (item) => {
-    setIsEditMode(true);
-    setCurrentId(item.id_persyaratan);
-    setFormData({
-      nama_persyaratan: item.nama_persyaratan,
-      jenis_persyaratan: item.jenis_persyaratan,
-      keterangan: item.keterangan || ''
-    });
-    setShowModal(true);
-  };
-
-  const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: 'Hapus Data?',
-      text: "Data tidak bisa dikembalikan!",
+  const handleDelete = (id_persyaratan) => {
+    Swal.fire({
+      title: 'Hapus Persyaratan?',
+      text: "Persyaratan ini akan dilepas dari skema ini.",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Ya, Hapus'
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await api.delete(`/admin/persyaratan/${id}`);
-        Swal.fire('Terhapus!', 'Data berhasil dihapus.', 'success');
-        fetchData();
-      } catch (error) {
-        Swal.fire('Gagal', 'Gagal menghapus data', 'error');
+      confirmButtonText: 'Ya, Lepaskan!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // Asumsi endpoint detach menggunakan parameter url atau body
+          await api.delete(`/admin/persyaratan/detach/${id}/${id_persyaratan}`);
+          Swal.fire('Terhapus!', 'Persyaratan telah dilepas dari skema.', 'success');
+          fetchData();
+        } catch (error) {
+          Swal.fire('Error', 'Gagal melepas persyaratan', 'error');
+        }
       }
-    }
+    });
   };
 
-  // Filter Search
   const filteredData = data.filter(item => 
-    item.nama_persyaratan.toLowerCase().includes(searchTerm.toLowerCase())
+    item.nama_persyaratan?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) return <div className="p-8 text-center text-slate-500">Memuat data...</div>;
 
   return (
     <div className="persyaratan-container">
-      {/* Header */}
       <div className="header-section">
         <div>
-          <h1 className="page-title">Persyaratan Dasar & Administratif</h1>
-          <p className="page-subtitle">Kelola persyaratan dasar & administratif skema</p>
+          <button onClick={() => navigate('/admin/skema')} className="flex items-center gap-2 text-slate-500 hover:text-slate-800 mb-2 text-sm font-medium">
+            <ArrowLeft size={16} /> Kembali ke Daftar Skema
+          </button>
+          <h2 className="page-title">Persyaratan Skema</h2>
+          <p className="page-subtitle text-orange-600 font-semibold">{skemaDetail?.nama_skema || 'Memuat Skema...'}</p>
         </div>
         <button 
-          className="btn-create bg-blue-600 text-white hover:bg-blue-700"
-          onClick={() => {
-            setFormData(initialForm);
-            setIsEditMode(false);
-            setShowModal(true);
-          }}
+          onClick={() => { setFormMode('pilih'); setFormData(initialForm); setShowModal(true); }}
+          className="btn-create bg-blue-600 hover:bg-blue-700 text-white"
         >
-          <Plus size={18} /> Tambah Data
+          <Plus size={18} /> Tambah Persyaratan
         </button>
       </div>
 
-      {/* Search */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex items-center gap-3">
-        <Search className="text-slate-400" size={20} />
-        <input 
-          type="text" 
-          placeholder="Cari nama persyaratan..." 
-          className="bg-transparent w-full outline-none text-slate-700"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+      <div className="content-card">
+        <div className="flex justify-between items-center mb-6">
+          <div className="relative w-64">
+            <input 
+              type="text" 
+              placeholder="Cari persyaratan..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none"
+            />
+            <Search className="absolute left-3 top-2.5 text-slate-400" size={18} />
+          </div>
+        </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
-            <tr>
-              <th className="px-6 py-4 w-16 text-center">No</th>
-              <th className="px-6 py-4">Nama Persyaratan</th>
-              <th className="px-6 py-4">Jenis</th>
-              <th className="px-6 py-4">Keterangan</th>
-              <th className="px-6 py-4 text-center w-32">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {loading ? (
-              <tr><td colSpan="5" className="text-center py-8"><Loader2 className="animate-spin mx-auto"/></td></tr>
-            ) : filteredData.length === 0 ? (
-              <tr><td colSpan="5" className="text-center py-8 text-slate-500">Data kosong</td></tr>
-            ) : (
-              filteredData.map((item, index) => (
-                <tr key={item.id_persyaratan} className="hover:bg-slate-50">
-                  <td className="px-6 py-4 text-center">{index + 1}</td>
-                  <td className="px-6 py-4 font-medium text-slate-800">{item.nama_persyaratan}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded text-xs font-bold capitalize border
-                      ${item.jenis_persyaratan === 'dasar' 
-                        ? 'bg-blue-50 text-blue-700 border-blue-200' 
-                        : 'bg-purple-50 text-purple-700 border-purple-200'
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 text-slate-600 text-sm border-y border-slate-200">
+                <th className="p-4 font-semibold w-16 text-center">No</th>
+                <th className="p-4 font-semibold">Nama Persyaratan</th>
+                <th className="p-4 font-semibold">Jenis</th>
+                <th className="p-4 font-semibold text-center">Wajib?</th>
+                <th className="p-4 font-semibold text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData.length > 0 ? (
+                filteredData.map((item, index) => (
+                  <tr key={index} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <td className="p-4 text-center text-slate-500">{index + 1}</td>
+                    <td className="p-4 font-medium text-slate-800">{item.nama_persyaratan}</td>
+                    <td className="p-4">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                        item.jenis_persyaratan === 'dasar' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
                       }`}>
-                      {item.jenis_persyaratan}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-slate-500">{item.keterangan || '-'}</td>
-                  <td className="px-6 py-4 text-center">
-                    <div className="flex justify-center gap-2">
-                      <button onClick={() => handleEdit(item)} className="text-amber-500 hover:text-amber-600 p-1">
-                        <Edit2 size={18} />
-                      </button>
-                      <button onClick={() => handleDelete(item.id_persyaratan)} className="text-red-500 hover:text-red-600 p-1">
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
+                        {item.jenis_persyaratan === 'dasar' ? 'Dasar' : 'Administratif'}
+                      </span>
+                    </td>
+                    <td className="p-4 text-center">
+                      {/* Asumsi data wajib ada di item.skema_persyaratan.wajib (Pivot table) */}
+                      {item.skema_persyaratan?.wajib ? (
+                        <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-semibold">Wajib</span>
+                      ) : (
+                        <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-semibold">Opsional</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <button onClick={() => handleDelete(item.id_persyaratan)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-md" title="Hapus dari Skema">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="p-8 text-center text-slate-500">
+                    <FileCheck size={40} className="mx-auto mb-3 text-slate-300" />
+                    Belum ada persyaratan yang ditambahkan ke skema ini.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Modal Form */}
+      {/* --- MODAL TAMBAH PERSYARATAN --- */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl animate-slide-up overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-slate-800">
-                {isEditMode ? 'Edit Persyaratan' : 'Tambah Persyaratan'}
-              </h3>
-              <button onClick={() => setShowModal(false)}><X size={20} className="text-slate-400 hover:text-slate-600"/></button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="flex justify-between items-center p-5 border-b border-slate-100">
+              <h3 className="text-lg font-bold text-slate-800">Tambah Persyaratan Skema</h3>
+              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600"><X size={20}/></button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6">
+            <form onSubmit={handleCreateOrAttach} className="p-5">
+              
+              {/* Opsi Mode: Pilih yang ada atau Buat baru */}
+              <div className="flex gap-4 mb-4 border-b border-slate-200 pb-4">
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input type="radio" checked={formMode === 'pilih'} onChange={() => setFormMode('pilih')} className="text-blue-600" />
+                  Pilih Master yang Ada
+                </label>
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input type="radio" checked={formMode === 'baru'} onChange={() => setFormMode('baru')} className="text-blue-600" />
+                  Buat Master Baru
+                </label>
+              </div>
+
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Nama Persyaratan</label>
-                  <input 
-                    type="text" 
-                    name="nama_persyaratan" 
-                    value={formData.nama_persyaratan} 
-                    onChange={handleInputChange} 
-                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none"
-                    required 
-                  />
-                </div>
+                {formMode === 'pilih' ? (
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Pilih Persyaratan</label>
+                    <select 
+                      name="id_persyaratan" 
+                      value={formData.id_persyaratan} 
+                      onChange={handleInputChange}
+                      className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none"
+                      required
+                    >
+                      <option value="">-- Pilih Persyaratan --</option>
+                      {allPersyaratan.map(p => (
+                        <option key={p.id_persyaratan} value={p.id_persyaratan}>{p.nama_persyaratan} ({p.jenis_persyaratan})</option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Nama Persyaratan Baru</label>
+                      <input 
+                        type="text" 
+                        name="nama_persyaratan" 
+                        value={formData.nama_persyaratan} 
+                        onChange={handleInputChange} 
+                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none"
+                        required 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Jenis Persyaratan</label>
+                      <select 
+                        name="jenis_persyaratan" 
+                        value={formData.jenis_persyaratan} 
+                        onChange={handleInputChange}
+                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none"
+                      >
+                        <option value="dasar">Dasar</option>
+                        <option value="administratif">Administratif</option>
+                      </select>
+                    </div>
+                  </>
+                )}
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Jenis Persyaratan</label>
-                  <select 
-                    name="jenis_persyaratan" 
-                    value={formData.jenis_persyaratan} 
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none"
-                  >
-                    <option value="dasar">Dasar</option>
-                    <option value="administratif">Administratif</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1">Keterangan (Opsional)</label>
-                  <textarea 
-                    name="keterangan" 
-                    rows="3" 
-                    value={formData.keterangan} 
-                    onChange={handleInputChange}
-                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-100 outline-none"
-                  ></textarea>
+                  <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 cursor-pointer mt-4">
+                    <input 
+                      type="checkbox" 
+                      name="wajib" 
+                      checked={formData.wajib} 
+                      onChange={handleInputChange}
+                      className="w-4 h-4 text-blue-600 rounded border-slate-300"
+                    />
+                    Persyaratan ini WAJIB dipenuhi?
+                  </label>
                 </div>
               </div>
 
               <div className="mt-6 flex justify-end gap-3">
                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">Batal</button>
                 <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
-                  <Save size={18}/> Simpan
+                  <Save size={18}/> Tambahkan
                 </button>
               </div>
             </form>
@@ -250,4 +311,4 @@ const Persyaratan = () => {
   );
 };
 
-export default Persyaratan;
+export default SkemaPersyaratan;
