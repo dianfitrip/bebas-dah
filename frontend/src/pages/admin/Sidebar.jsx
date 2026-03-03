@@ -2,17 +2,17 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./adminstyles/Sidebar.css";
 import {
-  FaHome, FaBullhorn, FaGavel, FaChartBar, FaUniversity, FaBook, FaAward, 
-  FaLayerGroup, FaMoneyBillWave, FaCalendarAlt, FaBuilding, FaUserGraduate, 
-  FaUserTie, FaUsersCog, FaCommentDots, FaGlobe, FaCogs, FaCalculator, 
-  FaCreditCard, FaEnvelopeOpenText, FaEye, FaLock, FaSignOutAlt, 
+  FaHome, FaBullhorn, FaGavel, FaChartBar, FaUniversity, FaBook, FaAward,
+  FaLayerGroup, FaMoneyBillWave, FaCalendarAlt, FaBuilding, FaUserGraduate,
+  FaUserTie, FaUsersCog, FaCommentDots, FaGlobe, FaCogs, FaCalculator,
+  FaCreditCard, FaEnvelopeOpenText, FaEye, FaLock, FaSignOutAlt,
   FaChevronDown, FaChevronRight
 } from "react-icons/fa";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const sidebarContentRef = useRef(null); 
+  const sidebarContentRef = useRef(null);
 
   // State untuk Dropdown Menu
   const [openMenus, setOpenMenus] = useState({
@@ -20,7 +20,7 @@ const Sidebar = () => {
     standar: false,
     biaya: false,
     event: false,
-    tuk: false, 
+    tuk: false,
     asesi: false,
     asesor: false,
     manajemen: false,
@@ -31,19 +31,29 @@ const Sidebar = () => {
   // 1. AUTO-OPEN MENU INDUK JIKA ANAKNYA SEDANG AKTIF
   useEffect(() => {
     const path = location.pathname;
-    setOpenMenus((prev) => ({
-      ...prev,
-      laporan: prev.laporan || path.includes('/admin/laporan'),
-      standar: prev.standar || path.includes('/admin/unit-kompetensi') || path.includes('/admin/skkni'),
-      biaya: prev.biaya || path.includes('/admin/biaya'),
-      event: prev.event || path.includes('/admin/jadwal'),
-      tuk: prev.tuk || path.includes('/admin/tuk'), 
-      asesi: prev.asesi || path.includes('/admin/asesi') || path.includes('/admin/verifikasi-pendaftaran'),
-      asesor: prev.asesor || path.includes('/admin/asesor'),
-      manajemen: prev.manajemen || path.includes('/admin/manajemen'),
-      pembayaran: prev.pembayaran || path.includes('/admin/pembayaran'),
-      persuratan: prev.persuratan || path.includes('/admin/surat')
-    }));
+
+    setOpenMenus((prev) => {
+      // Create a copy of the previous state
+      const newState = { ...prev };
+
+      // Helper function to handle strict logic (only open if the current path is inside the category)
+      const isPathActive = (pathsArray) => {
+        return pathsArray.some(p => path.startsWith(p));
+      };
+
+      newState.laporan = isPathActive(['/admin/laporan']);
+      newState.standar = isPathActive(['/admin/unit-kompetensi', '/admin/skkni']);
+      newState.biaya = isPathActive(['/admin/biaya']);
+      newState.event = isPathActive(['/admin/jadwal']);
+      newState.tuk = isPathActive(['/admin/tuk']);
+      newState.asesi = isPathActive(['/admin/asesi', '/admin/verifikasi-pendaftaran']);
+      newState.asesor = isPathActive(['/admin/asesor']);
+      newState.manajemen = isPathActive(['/admin/manajemen']);
+      newState.pembayaran = isPathActive(['/admin/pembayaran']);
+      newState.persuratan = isPathActive(['/admin/surat']);
+
+      return newState;
+    });
   }, [location.pathname]);
 
   // 2. KEMBALIKAN POSISI SCROLL SIDEBAR SETIAP RENDER
@@ -63,7 +73,7 @@ const Sidebar = () => {
     setOpenMenus((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const isActive = (path) => location.pathname.includes(path);
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   const handleNav = (path) => {
     navigate(path);
@@ -84,50 +94,50 @@ const Sidebar = () => {
       {/* CSS KHUSUS SIDEBAR ORANYE */}
       <style>{`
         .nav-item, .submenu-item, .nav-section-label, .nav-label, .nav-icon, .arrow-icon {
-          color: #1e293b !important; 
+          color: #1e293b !important;
         }
-        
+
         .logo-text h1, .logo-text p, .logo-icon {
           color: #1e293b !important;
         }
 
         .nav-item.active, .submenu-item.active {
           font-weight: 500 !important;
-          background-color: #ffffff !important; 
-          color: #000000 !important; 
+          background-color: #ffffff !important;
+          color: #000000 !important;
           border-radius: 6px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
+
         .nav-item.active .nav-icon, .nav-item.active .nav-label {
-          color: #000000 !important; 
+          color: #000000 !important;
         }
 
         .submenu-item.active .dot {
           background-color: #000000 !important;
           box-shadow: none !important;
         }
-        
+
         .nav-item:hover, .submenu-item:hover {
-          background-color: rgba(255, 255, 255, 0.3) !important; 
+          background-color: rgba(255, 255, 255, 0.3) !important;
         }
 
         .sidebar-footer .logout {
-          color: #1e293b !important; 
+          color: #1e293b !important;
           transition: all 0.2s ease-in-out;
         }
         .sidebar-footer .logout .nav-icon {
-          color: #000000 !important; 
+          color: #000000 !important;
         }
-        
+
         .sidebar-footer .logout:hover {
-          background-color: #fee2e2 !important; 
-          color: #b91c1c !important; 
+          background-color: #fee2e2 !important;
+          color: #b91c1c !important;
           font-weight: bold !important;
           border-radius: 6px;
         }
         .sidebar-footer .logout:hover .nav-icon {
-          color: #b91c1c !important; 
+          color: #b91c1c !important;
         }
       `}</style>
 
@@ -144,11 +154,11 @@ const Sidebar = () => {
 
       {/* CONTENT */}
       <div className="sidebar-content" ref={sidebarContentRef} onScroll={handleScroll}>
-        
+
         {/* UTAMA */}
         <div className="nav-section-label">Utama</div>
-        
-        <button className={`nav-item ${isActive('/admin/dashboard') ? 'active' : ''}`} onClick={() => handleNav('/admin/dashboard')}>
+
+        <button className={`nav-item ${location.pathname === '/admin/dashboard' ? 'active' : ''}`} onClick={() => handleNav('/admin/dashboard')}>
           <div className="nav-icon"><FaHome /></div>
           <span className="nav-label">Home / Dashboard</span>
         </button>
@@ -202,6 +212,8 @@ const Sidebar = () => {
           <div className="submenu">
             <button className={`submenu-item ${isActive('/admin/unit-kompetensi') ? 'active' : ''}`} onClick={() => handleNav('/admin/unit-kompetensi')}><span className="dot"></span> Unit Kompetensi</button>
             <button className={`submenu-item ${isActive('/admin/skkni') ? 'active' : ''}`} onClick={() => handleNav('/admin/skkni')}><span className="dot"></span> Data SKKNI</button>
+            <button className={`submenu-item ${isActive('/admin/bank-soal') ? 'active' : ''}`} onClick={() => handleNav('/admin/bank-soal')}><span className="dot"></span> Bank Soal</button>
+            <button className={`submenu-item ${isActive('/admin/bank-soal-pg') ? 'active' : ''}`} onClick={() => handleNav('/admin/bank-soal-pg')}><span className="dot"></span> Bank Soal PG</button>
           </div>
         )}
 
@@ -219,12 +231,13 @@ const Sidebar = () => {
           <div className="submenu">
             <button className={`submenu-item ${isActive('/admin/biaya/rekening') ? 'active' : ''}`} onClick={() => handleNav('/admin/biaya/rekening')}><span className="dot"></span> Rekening Bank</button>
             <button className={`submenu-item ${isActive('/admin/biaya/komponen') ? 'active' : ''}`} onClick={() => handleNav('/admin/biaya/komponen')}><span className="dot"></span> Komponen Biaya</button>
+            <button className={`submenu-item ${isActive('/admin/biaya/uji') ? 'active' : ''}`} onClick={() => handleNav('/admin/biaya/uji')}><span className="dot"></span> Biaya Uji</button>
           </div>
         )}
 
         {/* OPERASIONAL */}
         <div className="nav-section-label">Operasional</div>
-        
+
         <button className={`nav-item has-submenu ${openMenus.event ? 'open' : ''} ${isActive('/admin/jadwal') ? 'active' : ''}`} onClick={() => toggleMenu('event')}>
           <div className="nav-icon"><FaCalendarAlt /></div>
           <span className="nav-label">Event & Jadwal</span>
@@ -254,7 +267,7 @@ const Sidebar = () => {
         </button>
         {openMenus.tuk && (
           <div className="submenu">
-            <button className={`submenu-item ${isActive('/admin/tuk') && !isActive('/admin/tuk/persyaratan') ? 'active' : ''}`} onClick={() => handleNav('/admin/tuk')}>
+            <button className={`submenu-item ${location.pathname === '/admin/tuk' ? 'active' : ''}`} onClick={() => handleNav('/admin/tuk')}>
               <span className="dot"></span> Daftar TUK
             </button>
             <button className={`submenu-item ${isActive('/admin/tuk/persyaratan') ? 'active' : ''}`} onClick={() => handleNav('/admin/tuk/persyaratan')}>
@@ -272,10 +285,10 @@ const Sidebar = () => {
           <div className="submenu">
             {/* --- MENU TAMBAH ASESI (BARU) --- */}
             <button className={`submenu-item ${isActive('/admin/asesi/tambah') ? 'active' : ''}`} onClick={() => handleNav('/admin/asesi/tambah')}><span className="dot"></span> Tambah Asesi</button>
-            
+
             <button className={`submenu-item ${isActive('/admin/asesi/cari') ? 'active' : ''}`} onClick={() => handleNav('/admin/asesi/cari')}><span className="dot"></span> Pencarian Asesi</button>
             <button className={`submenu-item ${isActive('/admin/verifikasi-pendaftaran') ? 'active' : ''}`} onClick={() => handleNav('/admin/verifikasi-pendaftaran')}><span className="dot"></span> Pendaftar Baru</button>
-            
+
             {/* === SEMUA MENU MAPA DARI BACKEND DITAMPILKAN DI SINI === */}
             <button className={`submenu-item ${isActive('/admin/asesi/mapa') && !location.pathname.includes('/m01') && !location.pathname.includes('/m02') ? 'active' : ''}`} onClick={() => handleNav('/admin/asesi/mapa')}><span className="dot"></span> MAPA</button>
             <button className={`submenu-item ${location.pathname.includes('/m01') ? 'active' : ''}`} onClick={() => handleNav('/admin/asesi/mapa')}><span className="dot"></span> MAPA-01</button>
@@ -299,11 +312,14 @@ const Sidebar = () => {
         </button>
         {openMenus.asesor && (
           <div className="submenu">
-            <button className={`submenu-item ${isActive('/admin/asesor') && !isActive('/admin/asesor/statistik') ? 'active' : ''}`} onClick={() => handleNav('/admin/asesor')}>
+            <button className={`submenu-item ${location.pathname === '/admin/asesor' ? 'active' : ''}`} onClick={() => handleNav('/admin/asesor')}>
               <span className="dot"></span> Daftar Asesor
             </button>
             <button className={`submenu-item ${isActive('/admin/asesor/statistik') ? 'active' : ''}`} onClick={() => handleNav('/admin/asesor/statistik')}>
               <span className="dot"></span> Statistik Wilayah
+            </button>
+            <button className={`submenu-item ${isActive('/admin/asesor/jadwal') ? 'active' : ''}`} onClick={() => handleNav('/admin/asesor/jadwal')}>
+              <span className="dot"></span> Jadwal Asesor
             </button>
           </div>
         )}
@@ -315,7 +331,7 @@ const Sidebar = () => {
 
         {/* SISTEM & WEB */}
         <div className="nav-section-label">Sistem & Web</div>
-        
+
         <button className={`nav-item ${isActive('/admin/notifikasi') ? 'active' : ''}`} onClick={() => handleNav('/admin/notifikasi')}>
           <div className="nav-icon"><FaCommentDots /></div>
           <span className="nav-label">Notifikasi</span>

@@ -19,6 +19,7 @@ import Notifikasi from "../pages/admin/Notifikasi";
 import Pengaduan from "../pages/admin/Pengaduan";
 import ProfileAdmin from "../pages/admin/ProfileAdmin";
 import Banding from "../pages/admin/Banding";
+import Mapa from "../pages/admin/Mapa";
 
 /* PROTECTED */
 const getUser = () => {
@@ -58,6 +59,7 @@ export default function AdminRoutes() {
           <Route path="pengaduan" element={<Pengaduan />} />
           <Route path="profil-lsp" element={<ProfileAdmin />} />
           <Route path="banding" element={<Banding />} />
+          <Route path="mapa" element={<Mapa />} />
         </Route>
       </Routes>
     </ProtectedAdmin>
