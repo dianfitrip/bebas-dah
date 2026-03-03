@@ -22,19 +22,11 @@
 
 .sidebar {
   width: 280px;
-  height: 100vh;
-  /* Sidebar memakai gradient orange agar tidak kaku */
+  min-height: 100vh;
   background: var(--primary-orange-gradient);
-  /* Border kanan sidebar sedikit lebih tebal & jelas */
-  border-right: 2px solid var(--sidebar-border); 
+  border-right: 2px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 50;
-  font-family: 'Inter', sans-serif;
-  box-shadow: 4px 0 24px rgba(0,0,0,0.05);
 }
 
 /* HEADER */
