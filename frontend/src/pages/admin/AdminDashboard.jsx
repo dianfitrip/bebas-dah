@@ -33,6 +33,94 @@ const DashboardOverview = () => {
 
   return (
     <div className="dashboard-container">
+      
+      {/* --- INJEKSI OVERRIDE TEMA WARNA TERANG (AKSEN BIRU & ORANYE) --- */}
+      <style>{`
+        /* Background Utama Terang */
+        .admin-layout, .main-content, .dashboard-container, .content-area {
+          background-color: #FAFAFA !important; /* Putih agak abu biar bersih */
+          color: #071E3D !important; /* Teks utama pakai biru gelap */
+        }
+        
+        /* Card & Kotak (Putih Bersih) */
+        .stat-card, .card-box {
+          background-color: #FFFFFF !important;
+          border: 1px solid rgba(7, 30, 61, 0.08) !important;
+          color: #071E3D !important;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* Teks di dalam Card */
+        .stat-info h3, .card-header-inner h4, .schedule-item .info h5 {
+          color: #071E3D !important;
+          font-weight: 700 !important;
+        }
+        .stat-info p, .card-header-inner p, .bar-item span, .bar-item .val, .schedule-item .info p {
+          color: #182D4A !important;
+        }
+
+        /* Icon Card Atas */
+        .stat-icon {
+          background-color: #182D4A !important; /* Background icon biru sekunder */
+          color: #CC6B27 !important; /* Icon warna oranye */
+        }
+
+        /* Progress Bar (Chart Batang) */
+        .progress-track {
+          background-color: rgba(7, 30, 61, 0.1) !important; /* Track abu-biru tipis */
+        }
+        .progress-fill {
+          background-color: #CC6B27 !important; /* Fill oranye */
+        }
+
+        /* Tabel Data Pendaftar */
+        .dashboard-table th {
+          background-color: #071E3D !important; /* Header tabel biru tua pekat */
+          color: #FAFAFA !important; /* Teks header putih */
+          border-bottom: 4px solid #CC6B27 !important; /* Aksen garis bawah oranye */
+        }
+        .dashboard-table td {
+          color: #071E3D !important;
+          border-bottom: 1px solid rgba(7, 30, 61, 0.08) !important;
+        }
+        .dashboard-table tr:hover {
+          background-color: rgba(204, 107, 39, 0.04) !important; /* Efek hover oranye tipis */
+        }
+
+        /* Highlight, Link & Tombol (Titik 3 / Lihat Semua) */
+        .btn-icon-small, .link-text, .text-muted {
+          color: #CC6B27 !important;
+        }
+        .link-text:hover {
+          color: #071E3D !important;
+        }
+
+        /* Kotak Tanggal Jadwal */
+        .schedule-item .date-box {
+          background-color: #071E3D !important; /* Kotak biru tua */
+          color: #FAFAFA !important;
+          border: 2px solid #CC6B27 !important; /* Border oranye */
+        }
+        .schedule-item .date-box .m {
+          color: #CC6B27 !important; /* Bulan oranye */
+          font-weight: bold;
+        }
+
+        /* Chart Pie & Legend */
+        .pie-center {
+          background-color: #FFFFFF !important; /* Tengah pie chart tetap putih */
+          color: #071E3D !important;
+        }
+        .dot.orange { background-color: #CC6B27 !important; }
+        .dot.gray { background-color: #182D4A !important; } /* Aksen sekunder */
+
+        /* Badge Status */
+        .badge.menunggu { background-color: rgba(204, 107, 39, 0.1) !important; color: #CC6B27 !important; border: 1px solid #CC6B27 !important; }
+        .badge.verifikasi { background-color: rgba(24, 45, 74, 0.1) !important; color: #182D4A !important; border: 1px solid #182D4A !important; }
+        .badge.diterima { background-color: rgba(40, 167, 69, 0.1) !important; color: #28a745 !important; border: 1px solid #28a745 !important; }
+        .badge.ditolak { background-color: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important; border: 1px solid #dc3545 !important; }
+      `}</style>
+
       {/* 1. STATS CARDS */}
       <div className="stats-grid">
         {stats.map((item, index) => (
@@ -61,7 +149,6 @@ const DashboardOverview = () => {
               <div className="progress-track"><div className="progress-fill" style={{width: '85%'}}></div></div>
               <span className="val">850</span>
             </div>
-            {/* ... bagian baris chart lainnya tetap sama ... */}
             <div className="bar-item">
               <span>Jaringan</span>
               <div className="progress-track"><div className="progress-fill" style={{width: '60%'}}></div></div>
@@ -86,7 +173,8 @@ const DashboardOverview = () => {
             <button className="btn-icon-small"><FaEllipsisV /></button>
           </div>
           <div className="pie-chart-container">
-            <div className="pie-chart" style={{ background: `conic-gradient(#FF8A00 0% 70%, #F3F4F6 70% 100%)` }}>
+            {/* GRADIENT PIE CHART DISESUAIKAN: ORANYE (#CC6B27) & BIRU (#182D4A) */}
+            <div className="pie-chart" style={{ background: `conic-gradient(#CC6B27 0% 70%, #182D4A 70% 100%)` }}>
               <div className="pie-center">
                 <span>70%</span>
                 <small>Kompeten</small>
@@ -102,7 +190,6 @@ const DashboardOverview = () => {
 
       {/* 3. TABLE & SCHEDULE */}
       <div className="bottom-grid">
-        {/* ... bagian tabel dan schedule tetap sama persis ... */}
         <div className="card-box table-section">
           <div className="card-header-inner">
             <h4>Pendaftaran Terbaru</h4>
