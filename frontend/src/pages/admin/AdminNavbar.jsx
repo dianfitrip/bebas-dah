@@ -23,26 +23,26 @@ const AdminNavbar = () => {
   }, []);
 
   return (
-    <header className="top-header">
-      {/* CSS KHUSUS UNTUK UBAH TEKS NAVBAR JADI HITAM/GELAP */}
+    <header className="top-header" style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid rgba(7, 30, 61, 0.08)' }}>
+      {/* CSS KHUSUS UNTUK UBAH TEKS NAVBAR JADI TEMA BIRU & ORANYE */}
       <style>{`
         /* Judul Sapaan */
         .top-header .header-title h3 {
-          color: #1e293b !important; /* Hitam elegan */
+          color: #071E3D !important; /* Biru Tua */
           font-weight: 700;
           margin-bottom: 2px;
         }
         
         /* Subtitle / Teks kecil di bawah sapaan */
         .top-header .header-title .subtitle {
-          color: #475569 !important; /* Abu-abu gelap (agar tidak tertukar dengan judul utama) */
+          color: #182D4A !important; /* Biru Navy untuk teks sekunder */
           font-weight: 500;
         }
 
         /* Lingkaran Avatar Inisial */
         .top-header .avatar {
-          background-color: #f97316 !important; /* Warna Oranye agar serasi dengan sidebar */
-          color: #ffffff !important; /* Teks inisial putih */
+          background-color: #CC6B27 !important; /* Oranye */
+          color: #FAFAFA !important; /* Teks inisial putih bersih */
           font-weight: bold;
           display: flex;
           align-items: center;
@@ -50,7 +50,7 @@ const AdminNavbar = () => {
           width: 40px;
           height: 40px;
           border-radius: 50%;
-          box-shadow: 0 2px 4px rgba(249, 115, 22, 0.3); /* Tambahan efek shadow tipis */
+          box-shadow: 0 2px 6px rgba(204, 107, 39, 0.3); /* Shadow oranye tipis */
         }
       `}</style>
 
@@ -77,14 +77,14 @@ const AdminNavbar = () => {
             borderRadius: '8px',
             transition: 'background 0.2s'
           }}
-          onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(204, 107, 39, 0.08)'} // Hover efek oranye transparan
           onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
         >
           <div className="text-right">
-            <span className="name" style={{ display: 'block', fontWeight: '700', fontSize: '14px', color: '#1e293b' }}>
+            <span className="name" style={{ display: 'block', fontWeight: '700', fontSize: '14px', color: '#071E3D' }}>
               {userData.name}
             </span>
-            <span className="role" style={{ fontSize: '12px', color: '#64748b', fontWeight: '500' }}>
+            <span className="role" style={{ fontSize: '12px', color: '#182D4A', fontWeight: '500' }}>
               {userData.role}
             </span>
           </div>

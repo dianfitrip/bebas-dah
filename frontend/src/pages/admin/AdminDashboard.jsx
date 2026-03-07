@@ -1,7 +1,4 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import Sidebar from './Sidebar';
-import AdminNavbar from './AdminNavbar'; // Import komponen navbar yang baru dibuat
 import './adminstyles/AdminDashboard.css';
 import {
   FaLayerGroup,
@@ -12,8 +9,7 @@ import {
   FaCalendarAlt
 } from "react-icons/fa";
 
-// --- KOMPONEN: DASHBOARD OVERVIEW (RESUME & STATISTIK) ---
-const DashboardOverview = () => {
+const AdminDashboard = () => {
   const currentYear = new Date().getFullYear();
 
   const stats = [
@@ -246,33 +242,6 @@ const DashboardOverview = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-// --- KOMPONEN UTAMA: ADMIN DASHBOARD (LAYOUT) ---
-const AdminDashboard = () => {
-  const location = useLocation();
-
-  // Cek apakah user sedang di halaman Dashboard Home
-  const isDashboardHome = location.pathname === '/admin/dashboard' || location.pathname === '/admin';
-
-  return (
-    <div className="admin-layout">
-      {/* SIDEBAR NAVIGATION */}
-      <Sidebar />
-      
-      <main className="main-content">
-        
-        {/* PANGGIL ADMIN NAVBAR YANG BARU */}
-        <AdminNavbar />
-
-        {/* DYNAMIC CONTENT AREA */}
-        <div className="content-area">
-           {/* Jika URL Dashboard -> Tampilkan Statistik. Jika Bukan -> Tampilkan Outlet (Halaman Lain) */}
-           {isDashboardHome ? <DashboardOverview /> : <Outlet />}
-        </div>
-      </main>
     </div>
   );
 };
