@@ -12,10 +12,10 @@ const AdminDashboard = () => {
   const currentYear = new Date().getFullYear();
 
   const stats = [
-    { label: "Total Skema", value: "12", icon: <FaLayerGroup />, color: "orange" },
-    { label: "Total Asesor", value: "45", icon: <FaUserTie />, color: "blue" },
-    { label: "Total Asesi", value: "1,250", icon: <FaUsers />, color: "green" },
-    { label: "Data TUK", value: "8", icon: <FaBuilding />, color: "purple" },
+    { label: "Total Skema", value: "12", icon: <FaLayerGroup />, color: "text-[#CC6B27]", bg: "bg-[#CC6B27]/10" },
+    { label: "Total Asesor", value: "45", icon: <FaUserTie />, color: "text-[#182D4A]", bg: "bg-[#182D4A]/10" },
+    { label: "Total Asesi", value: "1,250", icon: <FaUsers />, color: "text-green-600", bg: "bg-green-100" },
+    { label: "Data TUK", value: "8", icon: <FaBuilding />, color: "text-purple-600", bg: "bg-purple-100" },
   ];
 
   const recentRegistrations = [
@@ -27,220 +27,143 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="dashboard-container">
+    /* Container Utama dengan padding (p-6) agar tidak dempet dengan sidebar/navbar */
+    <div className="p-6 md:p-8 bg-[#FAFAFA] min-h-screen flex flex-col gap-6">
       
-      {/* --- INJEKSI OVERRIDE TEMA WARNA TERANG (AKSEN BIRU & ORANYE) --- */}
-      <style>{`
-        /* Background Utama Terang */
-        .admin-layout, .main-content, .dashboard-container, .content-area {
-          background-color: #FAFAFA !important; /* Putih agak abu biar bersih */
-          color: #071E3D !important; /* Teks utama pakai biru gelap */
-        }
-        
-        /* Card & Kotak (Putih Bersih) */
-        .stat-card, .card-box {
-          background-color: #FFFFFF !important;
-          border: 1px solid rgba(7, 30, 61, 0.08) !important;
-          color: #071E3D !important;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04) !important;
-        }
-
-        /* Teks di dalam Card */
-        .stat-info h3, .card-header-inner h4, .schedule-item .info h5 {
-          color: #071E3D !important;
-          font-weight: 700 !important;
-        }
-        .stat-info p, .card-header-inner p, .bar-item span, .bar-item .val, .schedule-item .info p {
-          color: #182D4A !important;
-        }
-
-        /* Icon Card Atas */
-        .stat-icon {
-          background-color: #182D4A !important; /* Background icon biru sekunder */
-          color: #CC6B27 !important; /* Icon warna oranye */
-        }
-
-        /* Progress Bar (Chart Batang) */
-        .progress-track {
-          background-color: rgba(7, 30, 61, 0.1) !important; /* Track abu-biru tipis */
-        }
-        .progress-fill {
-          background-color: #CC6B27 !important; /* Fill oranye */
-        }
-
-        /* Tabel Data Pendaftar */
-        .dashboard-table th {
-          background-color: #071E3D !important; /* Header tabel biru tua pekat */
-          color: #FAFAFA !important; /* Teks header putih */
-          border-bottom: 4px solid #CC6B27 !important; /* Aksen garis bawah oranye */
-        }
-        .dashboard-table td {
-          color: #071E3D !important;
-          border-bottom: 1px solid rgba(7, 30, 61, 0.08) !important;
-        }
-        .dashboard-table tr:hover {
-          background-color: rgba(204, 107, 39, 0.04) !important; /* Efek hover oranye tipis */
-        }
-
-        /* Highlight, Link & Tombol (Titik 3 / Lihat Semua) */
-        .btn-icon-small, .link-text, .text-muted {
-          color: #CC6B27 !important;
-        }
-        .link-text:hover {
-          color: #071E3D !important;
-        }
-
-        /* Kotak Tanggal Jadwal */
-        .schedule-item .date-box {
-          background-color: #071E3D !important; /* Kotak biru tua */
-          color: #FAFAFA !important;
-          border: 2px solid #CC6B27 !important; /* Border oranye */
-        }
-        .schedule-item .date-box .m {
-          color: #CC6B27 !important; /* Bulan oranye */
-          font-weight: bold;
-        }
-
-        /* Chart Pie & Legend */
-        .pie-center {
-          background-color: #FFFFFF !important; /* Tengah pie chart tetap putih */
-          color: #071E3D !important;
-        }
-        .dot.orange { background-color: #CC6B27 !important; }
-        .dot.gray { background-color: #182D4A !important; } /* Aksen sekunder */
-
-        /* Badge Status */
-        .badge.menunggu { background-color: rgba(204, 107, 39, 0.1) !important; color: #CC6B27 !important; border: 1px solid #CC6B27 !important; }
-        .badge.verifikasi { background-color: rgba(24, 45, 74, 0.1) !important; color: #182D4A !important; border: 1px solid #182D4A !important; }
-        .badge.diterima { background-color: rgba(40, 167, 69, 0.1) !important; color: #28a745 !important; border: 1px solid #28a745 !important; }
-        .badge.ditolak { background-color: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important; border: 1px solid #dc3545 !important; }
-      `}</style>
-
-      {/* 1. STATS CARDS */}
-      <div className="stats-grid">
+      {/* 1. STATS CARDS GRID */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
         {stats.map((item, index) => (
-          <div className="stat-card" key={index}>
-            <div className={`stat-icon bg-${item.color}`}>
+          <div key={index} className="bg-white rounded-xl p-5 border border-[#071E3D]/10 shadow-sm flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${item.bg} ${item.color}`}>
               {item.icon}
             </div>
-            <div className="stat-info">
-              <h3>{item.value}</h3>
-              <p>{item.label}</p>
+            <div>
+              <h3 className="text-2xl font-bold text-[#071E3D] leading-none mb-1">{item.value}</h3>
+              <p className="text-[13px] text-[#182D4A] m-0">{item.label}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* 2. CHARTS */}
-      <div className="charts-grid">
-        <div className="card-box">
-          <div className="card-header-inner">
-            <h4>Pendaftar dan Kandidat Tahun {currentYear}</h4>
-            <button className="btn-icon-small"><FaEllipsisV /></button>
+      {/* 2. CHARTS GRID (Tetap bersampingan: Kiri Bar Chart, Kanan Pie Chart) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* Bar Chart - Kiri (Porsi 2/3) */}
+        <div className="md:col-span-2 bg-white rounded-xl p-6 border border-[#071E3D]/10 shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <h4 className="font-bold text-[#071E3D] text-[16px] m-0">Pendaftar dan Kandidat Tahun {currentYear}</h4>
+            <button className="text-[#CC6B27] hover:text-[#071E3D]"><FaEllipsisV /></button>
           </div>
-          <div className="bar-chart-list">
-            <div className="bar-item">
-              <span>Web Dev</span>
-              <div className="progress-track"><div className="progress-fill" style={{width: '85%'}}></div></div>
-              <span className="val">850</span>
-            </div>
-            <div className="bar-item">
-              <span>Jaringan</span>
-              <div className="progress-track"><div className="progress-fill" style={{width: '60%'}}></div></div>
-              <span className="val">600</span>
-            </div>
-            <div className="bar-item">
-              <span>Desain</span>
-              <div className="progress-track"><div className="progress-fill" style={{width: '45%'}}></div></div>
-              <span className="val">450</span>
-            </div>
-            <div className="bar-item">
-              <span>Admin</span>
-              <div className="progress-track"><div className="progress-fill" style={{width: '75%'}}></div></div>
-              <span className="val">750</span>
-            </div>
+          <div className="flex flex-col gap-4">
+            {[
+              { label: 'Web Dev', val: 850, width: '85%' },
+              { label: 'Jaringan', val: 600, width: '60%' },
+              { label: 'Desain', val: 450, width: '45%' },
+              { label: 'Admin', val: 750, width: '75%' }
+            ].map((bar, i) => (
+              <div key={i} className="flex items-center gap-3 text-[13px]">
+                <span className="w-[70px] font-medium text-[#182D4A]">{bar.label}</span>
+                <div className="flex-1 h-2 bg-[#071E3D]/10 rounded overflow-hidden">
+                  <div className="h-full bg-[#CC6B27] rounded" style={{ width: bar.width }}></div>
+                </div>
+                <span className="w-10 text-right font-bold text-[#071E3D]">{bar.val}</span>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="card-box">
-          <div className="card-header-inner">
-            <h4>Persentase Kelulusan</h4>
-            <button className="btn-icon-small"><FaEllipsisV /></button>
+        {/* Pie Chart - Kanan (Porsi 1/3) */}
+        <div className="md:col-span-1 bg-white rounded-xl p-6 border border-[#071E3D]/10 shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <h4 className="font-bold text-[#071E3D] text-[16px] m-0">Persentase Kelulusan</h4>
+            <button className="text-[#CC6B27] hover:text-[#071E3D]"><FaEllipsisV /></button>
           </div>
-          <div className="pie-chart-container">
-            {/* GRADIENT PIE CHART DISESUAIKAN: ORANYE (#CC6B27) & BIRU (#182D4A) */}
-            <div className="pie-chart" style={{ background: `conic-gradient(#CC6B27 0% 70%, #182D4A 70% 100%)` }}>
-              <div className="pie-center">
-                <span>70%</span>
-                <small>Kompeten</small>
+          <div className="flex flex-col items-center">
+            <div className="w-[160px] h-[160px] rounded-full flex items-center justify-center mb-5 relative" 
+                 style={{ background: `conic-gradient(#CC6B27 0% 70%, #182D4A 70% 100%)` }}>
+              <div className="w-[110px] h-[110px] bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
+                <span className="text-[24px] font-extrabold text-[#071E3D]">70%</span>
+                <small className="text-[11px] text-[#182D4A]">Kompeten</small>
               </div>
             </div>
-            <div className="chart-legend">
-              <div className="legend-item"><span className="dot orange"></span> Kompeten</div>
-              <div className="legend-item"><span className="dot gray"></span> Belum Kompeten</div>
+            <div className="flex gap-4">
+              <div className="text-[12px] text-[#182D4A] flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#CC6B27]"></span> Kompeten
+              </div>
+              <div className="text-[12px] text-[#182D4A] flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#182D4A]"></span> Belum Kompeten
+              </div>
             </div>
           </div>
         </div>
+
       </div>
 
-      {/* 3. TABLE & SCHEDULE */}
-      <div className="bottom-grid">
-        <div className="card-box table-section">
-          <div className="card-header-inner">
-            <h4>Pendaftaran Terbaru</h4>
-            <a href="#" className="link-text">Lihat Semua</a>
+      {/* 3. TABLE & SCHEDULE GRID (Tetap bersampingan: Kiri Tabel, Kanan Jadwal) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* Table - Kiri (Porsi 2/3) */}
+        <div className="md:col-span-2 bg-white rounded-xl p-6 border border-[#071E3D]/10 shadow-sm overflow-hidden">
+          <div className="flex justify-between items-center mb-6">
+            <h4 className="font-bold text-[#071E3D] text-[16px] m-0">Pendaftaran Terbaru</h4>
+            <a href="#" className="text-[12px] font-semibold text-[#CC6B27] hover:text-[#071E3D] no-underline">Lihat Semua</a>
           </div>
-          <table className="dashboard-table">
-            <thead>
-              <tr>
-                <th>Nama Asesi</th>
-                <th>Skema</th>
-                <th>Tanggal</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentRegistrations.map((row, idx) => (
-                <tr key={idx}>
-                  <td className="fw-bold">{row.name}</td>
-                  <td>{row.schema}</td>
-                  <td>{row.date}</td>
-                  <td>
-                    <span className={`badge ${row.status.toLowerCase()}`}>{row.status}</span>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  <th className="text-left text-[12px] text-[#FAFAFA] bg-[#071E3D] font-semibold pb-3 pt-3 px-3 border-b-4 border-[#CC6B27] uppercase">Nama Asesi</th>
+                  <th className="text-left text-[12px] text-[#FAFAFA] bg-[#071E3D] font-semibold pb-3 pt-3 px-3 border-b-4 border-[#CC6B27] uppercase">Skema</th>
+                  <th className="text-left text-[12px] text-[#FAFAFA] bg-[#071E3D] font-semibold pb-3 pt-3 px-3 border-b-4 border-[#CC6B27] uppercase">Tanggal</th>
+                  <th className="text-left text-[12px] text-[#FAFAFA] bg-[#071E3D] font-semibold pb-3 pt-3 px-3 border-b-4 border-[#CC6B27] uppercase">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {recentRegistrations.map((row, idx) => (
+                  <tr key={idx} className="hover:bg-[#CC6B27]/5 border-b border-[#071E3D]/10 last:border-0 transition-colors">
+                    <td className="py-3.5 px-3 font-semibold text-[13.5px] text-[#071E3D]">{row.name}</td>
+                    <td className="py-3.5 px-3 text-[13.5px] text-[#182D4A]">{row.schema}</td>
+                    <td className="py-3.5 px-3 text-[13.5px] text-[#182D4A]">{row.date}</td>
+                    <td className="py-3.5 px-3">
+                      {row.status === 'Menunggu' && <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#CC6B27]/10 text-[#CC6B27] border border-[#CC6B27]">Menunggu</span>}
+                      {row.status === 'Verifikasi' && <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#182D4A]/10 text-[#182D4A] border border-[#182D4A]">Verifikasi</span>}
+                      {row.status === 'Diterima' && <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-green-100 text-green-600 border border-green-500">Diterima</span>}
+                      {row.status === 'Ditolak' && <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-red-100 text-red-600 border border-red-500">Ditolak</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div className="card-box schedule-section">
-          <div className="card-header-inner">
-            <h4>Jadwal Asesmen</h4>
-            <FaCalendarAlt className="text-muted" />
+        {/* Schedule - Kanan (Porsi 1/3) */}
+        <div className="md:col-span-1 bg-white rounded-xl p-6 border border-[#071E3D]/10 shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <h4 className="font-bold text-[#071E3D] text-[16px] m-0">Jadwal Asesmen</h4>
+            <FaCalendarAlt className="text-[#CC6B27]" />
           </div>
-          <div className="schedule-list">
-            <div className="schedule-item">
-              <div className="date-box">
-                <span className="d">18</span><span className="m">FEB</span>
+          <div className="flex flex-col gap-4">
+            {[
+              { day: '18', month: 'FEB', title: 'Uji Kompetensi Web', time: '08:00 WIB • Lab 1' },
+              { day: '20', month: 'FEB', title: 'Uji Komp. Jaringan', time: '09:00 WIB • Lab 2' }
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3.5 p-2.5 rounded-lg hover:bg-[#FAFAFA] transition-colors">
+                <div className="bg-[#071E3D] text-[#FAFAFA] rounded-lg py-2 px-3 text-center min-w-[55px] border-2 border-[#CC6B27]">
+                  <span className="block text-[18px] font-extrabold leading-none">{item.day}</span>
+                  <span className="text-[10px] font-bold text-[#CC6B27]">{item.month}</span>
+                </div>
+                <div>
+                  <h5 className="m-0 mb-1 text-[14px] font-bold text-[#071E3D]">{item.title}</h5>
+                  <p className="m-0 text-[12px] text-[#182D4A]">{item.time}</p>
+                </div>
               </div>
-              <div className="info">
-                <h5>Uji Kompetensi Web</h5>
-                <p>08:00 WIB • Lab 1</p>
-              </div>
-            </div>
-            <div className="schedule-item">
-              <div className="date-box">
-                <span className="d">20</span><span className="m">FEB</span>
-              </div>
-              <div className="info">
-                <h5>Uji Komp. Jaringan</h5>
-                <p>09:00 WIB • Lab 2</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
+
       </div>
+
     </div>
   );
 };
