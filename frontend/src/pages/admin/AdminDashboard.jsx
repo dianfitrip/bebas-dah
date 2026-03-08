@@ -1,5 +1,4 @@
 import React from 'react';
-import './adminstyles/AdminDashboard.css';
 import {
   FaLayerGroup,
   FaUserTie,

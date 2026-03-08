@@ -5,7 +5,7 @@ import {
   Search, Eye, Save, X,
   MessageSquare, User, Mail, Phone, CheckCircle, Clock, AlertCircle, Loader2
 } from 'lucide-react';
-import './adminstyles/Pengaduan.css'; 
+
 
 const Pengaduan = () => {
   // --- STATE ---
@@ -101,6 +101,107 @@ const Pengaduan = () => {
 
   return (
     <div className="pengaduan-container">
+      
+      {/* --- INJEKSI TEMA WARNA BIRU & ORANYE (BACKGROUND PUTIH) --- */}
+      <style>{`
+        /* Header Title */
+        .title-box h2 { color: #071E3D !important; font-weight: bold; }
+        .title-box p { color: #182D4A !important; }
+
+        /* Card Konten */
+        .content-card {
+          background-color: #FFFFFF !important;
+          border: 1px solid rgba(7, 30, 61, 0.08) !important;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
+        }
+        
+        .toolbar-title h4 { color: #071E3D !important; font-weight: bold; }
+
+        /* Search Input */
+        .search-icon-inside { color: #CC6B27 !important; }
+        .search-input { 
+          border: 1px solid rgba(7, 30, 61, 0.15) !important; 
+          color: #071E3D !important;
+        }
+        .search-input:focus {
+          border-color: #CC6B27 !important;
+          box-shadow: 0 0 0 3px rgba(204, 107, 39, 0.1) !important;
+          outline: none;
+        }
+
+        /* Tabel Modern */
+        .modern-table th {
+          background-color: #071E3D !important;
+          color: #FAFAFA !important;
+          border-bottom: 4px solid #CC6B27 !important;
+          font-weight: 600;
+        }
+        .modern-table td {
+          color: #071E3D !important;
+          border-bottom: 1px solid rgba(7, 30, 61, 0.08) !important;
+        }
+        .modern-table tr:hover td {
+          background-color: rgba(204, 107, 39, 0.04) !important;
+        }
+        .user-info .name { color: #071E3D !important; font-weight: 700; }
+        .user-info .email { color: #CC6B27 !important; font-weight: 500; }
+
+        /* Tombol Aksi Tabel */
+        .btn-icon.view {
+          color: #CC6B27 !important;
+          background-color: rgba(204, 107, 39, 0.1) !important;
+          border: 1px solid transparent !important;
+          transition: all 0.2s;
+        }
+        .btn-icon.view:hover {
+          background-color: #CC6B27 !important;
+          color: #FFFFFF !important;
+          box-shadow: 0 2px 6px rgba(204, 107, 39, 0.3) !important;
+        }
+
+        /* Modal Styling */
+        .modal-card { background-color: #FFFFFF !important; }
+        .modal-header-modern h3 { color: #071E3D !important; font-weight: bold; }
+        .btn-close-modern { color: #182D4A !important; transition: color 0.2s; }
+        .btn-close-modern:hover { color: #CC6B27 !important; }
+
+        /* Modal Body */
+        .box-title { color: #CC6B27 !important; font-weight: bold; border-bottom: 1px solid rgba(204, 107, 39, 0.2) !important; padding-bottom: 8px; }
+        .info-item label { color: #182D4A !important; opacity: 0.8; }
+        .info-item p { color: #071E3D !important; font-weight: 500; }
+        
+        .message-box { 
+          background-color: rgba(7, 30, 61, 0.02) !important; 
+          border-left: 4px solid #CC6B27 !important; 
+          border-radius: 4px;
+        }
+        .msg-text { color: #071E3D !important; line-height: 1.6; }
+        .msg-date { color: #CC6B27 !important; font-weight: 600; }
+
+        /* Input Status di Modal */
+        .status-action-box label { color: #071E3D !important; font-weight: 600; }
+        .status-select { 
+          border: 1px solid rgba(7, 30, 61, 0.2) !important; 
+          color: #071E3D !important; 
+          background-color: #FAFAFA !important;
+        }
+        .status-select:focus { border-color: #CC6B27 !important; outline: none; }
+
+        /* Button di Modal */
+        .btn-primary { 
+          background-color: #CC6B27 !important; 
+          color: #FFFFFF !important; 
+          border: none !important; 
+        }
+        .btn-primary:hover { background-color: #A8561D !important; }
+        .btn-secondary { 
+          background-color: #FFFFFF !important; 
+          color: #071E3D !important; 
+          border: 1px solid #071E3D !important; 
+        }
+        .btn-secondary:hover { background-color: rgba(7, 30, 61, 0.05) !important; }
+      `}</style>
+
       {/* HEADER */}
       <div className="header-section">
         <div className="title-box">
@@ -133,8 +234,8 @@ const Pengaduan = () => {
 
         {loading ? (
           <div className="loading-state">
-            <Loader2 className="animate-spin text-orange-500" size={32} />
-            <p>Memuat data pengaduan...</p>
+            <Loader2 className="animate-spin text-[#CC6B27]" size={32} />
+            <p className="text-[#071E3D] mt-2 font-medium">Memuat data pengaduan...</p>
           </div>
         ) : (
           <div className="table-responsive">
@@ -159,7 +260,7 @@ const Pengaduan = () => {
                         <div className="user-info">
                           {/* PERBAIKAN: Mapping data sesuai DB */}
                           <span className="name">{item.nama_pengadu}</span>
-                          <span className="email text-xs text-gray-500">{item.sebagai_siapa}</span>
+                          <span className="email text-xs">{item.sebagai_siapa}</span>
                         </div>
                       </td>
                       <td className="subject-col">
@@ -181,8 +282,8 @@ const Pengaduan = () => {
                 ) : (
                   <tr>
                     <td colSpan="6" className="empty-state">
-                      <MessageSquare size={40} className="text-gray-300 mb-2"/>
-                      <p>Data tidak ditemukan.</p>
+                      <MessageSquare size={40} className="text-gray-300 mb-2" style={{color: "rgba(7, 30, 61, 0.2)"}}/>
+                      <p style={{color: "#182D4A"}}>Data tidak ditemukan.</p>
                     </td>
                   </tr>
                 )}
@@ -205,7 +306,7 @@ const Pengaduan = () => {
               
               {/* INFO PENGIRIM */}
               <div className="info-box">
-                <h4 className="box-title"><User size={16}/> Informasi Pengirim</h4>
+                <h4 className="box-title flex items-center gap-2"><User size={16}/> Informasi Pengirim</h4>
                 <div className="info-grid">
                   <div className="info-item">
                     <label>Nama Lengkap</label>
@@ -216,11 +317,11 @@ const Pengaduan = () => {
                     <p className="capitalize">{selectedItem.sebagai_siapa}</p>
                   </div>
                   <div className="info-item">
-                    <label><Mail size={14}/> Email</label>
+                    <label className="flex items-center gap-1"><Mail size={14}/> Email</label>
                     <p>{selectedItem.email_pengadu || '-'}</p>
                   </div>
                   <div className="info-item">
-                    <label><Phone size={14}/> No HP</label>
+                    <label className="flex items-center gap-1"><Phone size={14}/> No HP</label>
                     <p>{selectedItem.no_hp_pengadu || '-'}</p>
                   </div>
                 </div>
@@ -228,20 +329,20 @@ const Pengaduan = () => {
 
               {/* ISI PENGADUAN */}
               <div className="message-box">
-                <h4 className="box-title"><MessageSquare size={16}/> Isi Laporan</h4>
-                <div className="message-content">
-                  <div className="message-header">
-                    <span className="msg-date"><Clock size={12} className="inline mr-1"/>{formatDate(selectedItem.tanggal_pengaduan)}</span>
+                <h4 className="box-title flex items-center gap-2"><MessageSquare size={16}/> Isi Laporan</h4>
+                <div className="message-content p-3 mt-2">
+                  <div className="message-header mb-2">
+                    <span className="msg-date flex items-center gap-1"><Clock size={12}/>{formatDate(selectedItem.tanggal_pengaduan)}</span>
                   </div>
                   <p className="msg-text">{selectedItem.isi_pengaduan}</p>
                 </div>
               </div>
 
               {/* UPDATE STATUS */}
-              <div className="status-action-box">
-                <label>Update Status Penanganan</label>
+              <div className="status-action-box mt-4">
+                <label className="block mb-2">Update Status Penanganan</label>
                 <select 
-                  className="status-select"
+                  className="status-select p-2 w-full rounded"
                   value={statusEdit} 
                   onChange={(e) => setStatusEdit(e.target.value)}
                 >
@@ -254,8 +355,8 @@ const Pengaduan = () => {
             </div>
 
             <div className="modal-footer-modern">
-              <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>Tutup</button>
-              <button type="button" className="btn-primary" onClick={handleStatusChange}>
+              <button type="button" className="btn-secondary py-2 px-4 rounded" onClick={() => setShowModal(false)}>Tutup</button>
+              <button type="button" className="btn-primary py-2 px-4 rounded flex items-center" onClick={handleStatusChange}>
                 <Save size={16} className="mr-2"/> Simpan Status
               </button>
             </div>
